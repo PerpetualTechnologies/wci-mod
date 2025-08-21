@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Chattigo Partner added by Perpetual Technologies
 
 """
 A factory partner class to ease the process of integrating with bot managing companies
@@ -23,10 +24,11 @@ from partners.botmaker.botmaker_partner import BotmakerPartner
 from partners.infobip.infobip_partner import InfobipPartner
 from partners.take.take_partner import TakePartner
 from partners.hermes.hermes_partner import HermesPartner
+from partners.chattigo.chattigo_partner import ChattigoPartner
 
 
 class PartnerType(Enum):
-    (BOTMAKER, TAKE, WHATSAPP, INFOBIP, HERMES) = range(5)
+    (BOTMAKER, TAKE, WHATSAPP, INFOBIP, HERMES, CHATTIGO) = range(6)
 
 
 AVAILABLE_PARTNERS = {
@@ -35,6 +37,7 @@ AVAILABLE_PARTNERS = {
     PartnerType.WHATSAPP: WhatsAppPartner(),
     PartnerType.INFOBIP: InfobipPartner(),
     PartnerType.HERMES: HermesPartner(),
+    PartnerType.CHATTIGO: ChattigoPartner(),
 }
 
 

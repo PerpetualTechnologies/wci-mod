@@ -131,7 +131,7 @@ function deploy_app(){
     read -r API_KEY
 
     echo -n "Type the message to be sent with the protocol number (E.g. Your protocol is):"
-    read -r PROTOCOL_MESSAGE
+    read -r PROTOCOL_MESSAGE="Chat id:"
 
     echo -n "Type the message to be sent AFTER the protocol number (E.g. Your protocol is 98765432. Hello, Advertiser):"
     read -r WELCOME_MESSAGE

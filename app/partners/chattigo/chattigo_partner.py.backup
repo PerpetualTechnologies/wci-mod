@@ -18,7 +18,6 @@ Chattigo Partner implementation
 
 import logging
 import re
-import json
 from typing import Optional
 from partners import Partner
 
@@ -41,54 +40,50 @@ class ChattigoPartner(Partner):
     def process_message(self, payload):
         """
         Process message from Chattigo webhook.
+        This is the required abstract method from Partner base class.
+        
+        Args:
+            payload: The webhook payload from Chattigo
+            
+        Returns:
+            Lead: Processed lead data or None if processing fails
         """
         try:
-            print(f"=== CHATTIGO DEBUG START ===")
-            print(f"Payload completo: {json.dumps(payload, indent=2)}")
-            
             # Extraer información del mensaje
             message_data = self._extract_message_data(payload)
-            print(f"Message data extraído: {json.dumps(message_data, indent=2)}")
             
             # Obtener número de teléfono
             phone = self._get_phone_number(message_data)
-            print(f"Teléfono extraído: '{phone}'")
             
             # Obtener texto del mensaje
             message_text = self._get_message_text(message_data)
-            print(f"Texto del mensaje: '{message_text}'")
             
             # Extraer protocolo del mensaje
             protocol = self._get_protocol(message_text)
-            print(f"Protocolo extraído: '{protocol}'")
             
             if not protocol:
-                print(f"❌ NO SE ENCONTRÓ PROTOCOLO")
                 logging.warning(f"No se encontró el protocolo en el mensaje de Chattigo: {message_text}")
                 return None
             
             if not phone:
-                print(f"❌ NO SE ENCONTRÓ TELÉFONO")
                 logging.warning(f"No se encontró el número de teléfono en el mensaje de Chattigo")
                 return None
             
-            print(f"✅ LLAMANDO get_protocol_by_phone con:")
-            print(f"   message: '{message_text}'")
-            print(f"   sender: '{phone}'")
-            print(f"   receiver: 'CHATTIGO'")
+            # Crear el objeto Lead
+            lead = Lead(phone=phone, protocol=protocol)
             
-            # LLAMAR A get_protocol_by_phone
-            from helpers.webhook.helpers import get_protocol_by_phone
-            result = get_protocol_by_phone(message_text, phone, "CHATTIGO")
-            print(f"✅ Resultado get_protocol_by_phone: {result}")
-            print(f"=== CHATTIGO DEBUG END ===")
+            # Agregar información adicional del webhook
+            lead.message_id = message_data.get('id', '')
+            lead.conversation_id = message_data.get('conversation_id', '')
+            lead.timestamp = message_data.get('timestamp')
             
-            return None
+            # Logging para debugging
+            logging.info(f"Protocolo {lead.protocol} asociado al teléfono {lead.phone}")
+            
+            return lead
             
         except Exception as e:
-            print(f"❌ ERROR en ChattigoPartner: {str(e)}")
-            import traceback
-            traceback.print_exc()
+            logging.error(f"Error al procesar el JSON de Chattigo: {str(e)}")
             return None
 
     def _extract_message_data(self, payload: dict) -> dict:
@@ -155,3 +150,5 @@ class ChattigoPartner(Partner):
                 return match.group(1).strip()
         
         return None
+
+
